@@ -1,0 +1,6 @@
+/Vuzee.Flyway/drivers/
+/Vuzee.Flyway/jars/
+/Vuzee.Flyway/jre/
+/Vuzee.Flyway/lib/
+/VuzeeWeb/src/main/webapp/resources/*
+!/VuzeeWeb/src/main/webapp/resources/css

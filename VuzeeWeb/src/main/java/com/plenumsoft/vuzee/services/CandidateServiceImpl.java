@@ -11,34 +11,33 @@ import com.plenumsoft.vuzee.repositories.CandidateRepository;
 @Service
 public class CandidateServiceImpl implements CandidateService {
 	CandidateRepository candidateRepository;
-	
-		
+
 	public CandidateServiceImpl(CandidateRepository candidateRepository) {
 		super();
 		this.candidateRepository = candidateRepository;
-		
+
 	}
-	
+
 	@Override
 	public List<Candidate> getAll() {
 		return (List<Candidate>) this.candidateRepository.findAll();
 	}
-	
+
 	@Override
 	public Long addCandidate(Candidate candidate) {
-		if(candidate==null)
+		if (candidate == null)
 			throw new CandidateServiceException("No se pudo agregar la entidad" + candidate);
-		
-		if(candidate.getName().length()==0)
+
+		if (candidate.getName().length() == 0)
 			throw new CandidateServiceException("No se pudo agregar la entidad" + candidate);
-		
-		if(candidate.getPositionApplied().length()==0)
+
+		if (candidate.getPositionApplied().length() == 0)
 			throw new CandidateServiceException("No se pudo agregar la entidad" + candidate);
-		
+
 		Candidate insertedCandidate = this.candidateRepository.save(candidate);
-		if(insertedCandidate!=null)
+		if (insertedCandidate != null)
 			return insertedCandidate.getId();
-		
+
 		return null;
 	}
 
@@ -52,8 +51,12 @@ public class CandidateServiceImpl implements CandidateService {
 	public void updateCandidate(Candidate candidate) {
 		// TODO Auto-generated method stub
 		candidateRepository.save(candidate);
-		
-	}
-	
-}
 
+	}
+
+	@Override
+	public void deleteCandidate(Long id) {
+		candidateRepository.delete(id);
+	}
+
+}
