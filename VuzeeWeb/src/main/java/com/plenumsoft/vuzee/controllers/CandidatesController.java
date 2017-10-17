@@ -1,11 +1,11 @@
 package com.plenumsoft.vuzee.controllers;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
-import javax.xml.ws.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,12 +14,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.plenumsoft.vuzee.entities.Candidate;
 import com.plenumsoft.vuzee.services.CandidateService;
@@ -56,9 +56,11 @@ public class CandidatesController {
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public String PostCreateCandidate(@Valid CandidateCreateViewModel candidateCreateViewModel,
-			BindingResult bindingResult) {
+	public String PostCreateCandidate(@Valid CandidateCreateViewModel candidateCreateViewModel, Model model,
+			RedirectAttributes redirectAttributes, BindingResult bindingResult, @RequestParam("cv") MultipartFile cv)
+			throws IOException {
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("message", "Favor de verificar las entradas");
 			return prefix + "create";
 		}
 		Candidate candidate = new Candidate();
@@ -66,41 +68,80 @@ public class CandidatesController {
 		candidate.setPositionApplied(candidateCreateViewModel.getPositionApplied());
 		candidate.setCreatedBy("msoberanis");// TODO: hard-code
 		candidate.setCreatedAt(new Date());
+		if (cv != null) {
+			candidate.setCv(cv.getBytes());
+		}
 		candidateService.addCandidate(candidate);
+		redirectAttributes.addFlashAttribute("message", "Se ha creado correctamente el candidato");
 		return "redirect:/candidates";
 	}
 
 	@RequestMapping(value = { "/edit/{id}" }, method = RequestMethod.GET)
 	public String PrepareEdit(@PathVariable("id") Long id, Model model) {
 		Candidate candidate = candidateService.findById(id);
-		model.addAttribute("candidateEditViewModel", candidate);
+		CandidateEditViewModel cadidateEdit = new CandidateEditViewModel();
+		cadidateEdit.setId(candidate.getId());
+		cadidateEdit.setCreatedAt(candidate.getCreatedAt());
+		cadidateEdit.setCreatedBy(candidate.getCreatedBy());
+		cadidateEdit.setName(candidate.getName());
+		cadidateEdit.setPositionApplied(candidate.getPositionApplied());
+		model.addAttribute("candidateEditViewModel", cadidateEdit);
 		return prefix + "edit";
 	}
 
 	@RequestMapping(value = { "/edit/{id}" }, method = RequestMethod.PUT)
 	public String PutEdit(@Valid CandidateEditViewModel candidateEditViewModel, BindingResult bindingResult,
-			Model model) {
+			RedirectAttributes redirectAttributes, Model model, @RequestParam("cv") MultipartFile cv)
+			throws IOException {
 
-		if (bindingResult.hasErrors()) {
-			return prefix + "edit";
-		}
 		Long id = candidateEditViewModel.getId();
 		Candidate candidate = candidateService.findById(id);
+		if (bindingResult.hasErrors()) {
+			candidateEditViewModel.setCreatedAt(candidate.getCreatedAt());
+			candidateEditViewModel.setCreatedBy(candidate.getCreatedBy());
+			model.addAttribute("message", "Favor de verificar las entradas");
+			return prefix + "edit";
+		}
+
+		if (cv != null) {
+			candidate.setCv(cv.getBytes());
+		}
 		candidate.setName(candidateEditViewModel.getName());
 		candidate.setPositionApplied(candidateEditViewModel.getPositionApplied());
-
 		candidateService.updateCandidate(candidate);
+		redirectAttributes.addFlashAttribute("message", "Se ha actualizado correctamente el usuario.");
 		return "redirect:/candidates";
 	}
 
 	@RequestMapping(value = { "/delete/{id}" }, method = RequestMethod.DELETE)
-	public ResponseEntity<?> deleteCandidate(@PathVariable Long id, Model model) {
+	public ResponseEntity<?> deleteCandidate(@PathVariable Long id, Model model,
+			RedirectAttributes redirectAttributes) {
 		if (id != null) {
 			candidateService.deleteCandidate(id);
 		} else {
 			return new ResponseEntity<>("Identificador vacio", HttpStatus.BAD_REQUEST);
 		}
+		redirectAttributes.addFlashAttribute("message", "Se ha cargado correctamente el CV");
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/uploadcv", method = RequestMethod.POST)
+	public String uploadCV(@RequestParam("id") Long id, @RequestParam("file") MultipartFile file,
+			RedirectAttributes redirectAttributes) throws Exception {
+		Candidate candidate = candidateService.findById(id);
+		candidate.setCv(file.getBytes());
+		candidateService.updateCandidate(candidate);
+		redirectAttributes.addFlashAttribute("message", "Se ha cargado correctamente el CV");
+		return "redirect:/candidates";
+	}
+
+	@RequestMapping(value = "/downloadcv/{id}", method = RequestMethod.GET)
+	public void downloadCV(@PathVariable("id") Long id, RedirectAttributes redirectAttributes,
+			HttpServletResponse response) throws Exception {
+		Candidate candidate = candidateService.findById(id);
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Disposition", "attachment;filename=cv_" + candidate.getName() + ".pdf");
+		response.getOutputStream().write(candidate.getCv());
 	}
 
 }
