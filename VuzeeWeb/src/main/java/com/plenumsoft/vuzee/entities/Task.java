@@ -13,28 +13,34 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
-@Table(name="tasks")
+@Table(name = "tasks")
 public class Task {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(name="task_date")
+	@Temporal(TemporalType.TIMESTAMP)
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	@Column(name = "task_date")
 	private Date taskDate;
-	
+
 	private boolean hasRating;
-	
+
 	private Date createdAt;
-	
+
 	private String createdBy;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(name="task_type")
-	private TaskType taskType;
-	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="candidate_id")
+
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "task_state")
+	private TaskState taskState;
+
+	@JoinColumn(name = "candidate_id", referencedColumnName = "id")
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Candidate candidate;
 
 	public Long getId() {
@@ -77,12 +83,12 @@ public class Task {
 		this.createdBy = createdBy;
 	}
 
-	public TaskType getTaskType() {
-		return taskType;
+	public TaskState getTaskState() {
+		return taskState;
 	}
 
-	public void setTaskType(TaskType taskType) {
-		this.taskType = taskType;
+	public void setTaskState(TaskState taskState) {
+		this.taskState = taskState;
 	}
 
 	public Candidate getCandidate() {

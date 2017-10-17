@@ -29,7 +29,7 @@ import com.plenumsoft.vuzee.viewmodels.CandidateEditViewModel;
 @Controller
 @RequestMapping(value = { "/candidates" })
 public class CandidatesController {
-	String prefix = "candidates/";
+	private final String prefix = "candidates/";
 
 	private CandidateService candidateService;
 
@@ -109,19 +109,17 @@ public class CandidatesController {
 		candidate.setName(candidateEditViewModel.getName());
 		candidate.setPositionApplied(candidateEditViewModel.getPositionApplied());
 		candidateService.updateCandidate(candidate);
-		redirectAttributes.addFlashAttribute("message", "Se ha actualizado correctamente el usuario.");
+		redirectAttributes.addFlashAttribute("message", "Se ha actualizado correctamente el candidato.");
 		return "redirect:/candidates";
 	}
 
 	@RequestMapping(value = { "/delete/{id}" }, method = RequestMethod.DELETE)
-	public ResponseEntity<?> deleteCandidate(@PathVariable Long id, Model model,
-			RedirectAttributes redirectAttributes) {
+	public ResponseEntity<?> deleteCandidate(@PathVariable Long id) {
 		if (id != null) {
 			candidateService.deleteCandidate(id);
 		} else {
 			return new ResponseEntity<>("Identificador vacio", HttpStatus.BAD_REQUEST);
 		}
-		redirectAttributes.addFlashAttribute("message", "Se ha cargado correctamente el CV");
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

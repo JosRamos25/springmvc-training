@@ -3,7 +3,7 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorator="layout/main">
 <head>
-<title>Crear Candidato</title>
+<title>Crear Tarea</title>
 </head>
 <body>
 	<div layout:fragment="content">
@@ -15,15 +15,15 @@
 					<strong th:text="${message}"></strong>
 				</div>
 			</th:block>
-			<h1>Crear Candidato</h1>
+			<h1>Crear Tarea</h1>
 			<ol class="breadcrumb">
 				<li><a th:href="@{/}"><i class="fa fa-dashboard"></i> Home</a></li>
-				<li class="active">Candidatos</li>
+				<li class="active">Tareas</li>
 			</ol>
 		</section>
 		<section class="content">
-			<form action="#" th:action="@{/candidates/create}" enctype="multipart/form-data"
-				th:object="${candidateCreateViewModel}" method="post">
+			<form action="#" th:action="@{/tasks/create}" th:object="${taskView}"
+				method="post">
 				<div class="row">
 					<!-- left column -->
 					<div class="col-md-12">
@@ -36,21 +36,23 @@
 							<!-- form start -->
 							<div class="box-body">
 								<div class="form-group">
-									<label class="control-label">Nombre</label> <input type="text"
-										th:field="*{name}" class="form-control" /> <span
-										th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
-										class="text-danger">Error en nombre</span>
+									<label class="control-label">Candidato</label> <select
+										class="form-control" th:field="*{candidate.id}">
+										<option th:each="candidate : ${allCandidates}"
+											th:value="${candidate.id}" th:text="${candidate.name}"></option>
+									</select>
 								</div>
 								<div class="form-group">
-									<label class="control-label">Puesto al que aplica</label> <input
-										type="text" th:field="*{positionApplied}" class="form-control" />
-									<span th:if="${#fields.hasErrors('positionApplied')}"
-										th:errors="*{positionApplied}" class="text-danger">Error
-										en nombre</span>
+									<div class="input-group date" data-provide="datepicker">
+										<input th:field="*{taskDate}" type="text" class="form-control">
+										<div class="input-group-addon">
+											<span class="glyphicon glyphicon-th"></span>
+										</div>
+									</div>
 								</div>
 								<div class="form-group">
-									<label class="control-label">CV</label> <input type="file"
-										name="cv" class="form-control" />
+									<label class="control-label">Tiene calificaci&oacute;n</label>
+									<input type="checkbox" th:field="*{hasRating}" />
 								</div>
 							</div>
 							<!-- /.box-body -->
@@ -68,6 +70,14 @@
 			</form>
 		</section>
 
+
+		<script type="text/javascript">
+			$(function() {
+				$('.datepicker').datepicker({
+					format : "dd/mm/yy"
+				});
+			});
+		</script>
 	</div>
 </body>
 </html>

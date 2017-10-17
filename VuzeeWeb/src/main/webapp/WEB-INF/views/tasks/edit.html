@@ -3,7 +3,7 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorator="layout/main">
 <head>
-<title>Editar Candidato</title>
+<title>Editar Tarea</title>
 </head>
 <body>
 	<div layout:fragment="content">
@@ -15,14 +15,14 @@
 					<strong th:text="${message}"></strong>
 				</div>
 			</th:block>
-			<h1>Editar Candidato</h1>
+			<h1>Editar Tarea</h1>
 			<ol class="breadcrumb">
 				<li><a th:href="@{/}"><i class="fa fa-dashboard"></i> Home</a></li>
-				<li class="active">Candidatos</li>
+				<li class="active">Tareas</li>
 			</ol>
 		</section>
 		<section class="content">
-			<form th:object="${candidateEditViewModel}" th:method="put" enctype="multipart/form-data"
+			<form th:object="${taskEdit}" th:method="put"
 				th:action="@{${#httpServletRequest.servletPath}}">
 				<div class="row">
 					<!-- left column -->
@@ -40,30 +40,28 @@
 										th:text="*{id}"></label>
 								</div>
 								<div class="form-group">
-									<label class="control-label">Nombre</label> <input type="text"
-										th:field="*{name}" class="form-control" /> <span
-										th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
-										class="text-danger">Error en nombre</span>
+									<label class="control-label">Candidato</label><br /> <label
+										th:text="*{candidate.name}"></label>
 								</div>
 								<div class="form-group">
-									<label class="control-label">Puesto al que aplica</label> <input
-										type="text" th:field="*{positionApplied}" class="form-control" />
-									<span th:if="${#fields.hasErrors('positionApplied')}"
-										th:errors="*{positionApplied}" class="text-danger">Error
-										en nombre</span>
+									<div class="input-group date" data-provide="datepicker">
+										<input th:field="*{taskDate}" type="text" class="form-control">
+										<div class="input-group-addon">
+											<span class="glyphicon glyphicon-th"></span>
+										</div>
+									</div>
 								</div>
 								<div class="form-group">
-									<label class="control-label">CV</label> <input type="file"
-										name="cv" class="form-control" /> 
+									<label class="control-label">Tiene calificaci&oacute;n</label>
+									<input type="checkbox" th:field="*{hasRating}" />
 								</div>
 								<div class="form-group">
-									<label class="control-label">Fecha de creación</label><br />
-									<label
-										th:text="${#dates.format(candidateEditViewModel.createdAt, 'dd-MMM-yyyy HH:ss')}"></label>
-								</div>
-								<div class="form-group">
-									<label class="control-label">Creado por</label><br /> <label
-										th:text="${candidateEditViewModel.createdBy}"></label>
+									<label class="control-label">Estado</label> <select
+										th:field="*{taskState}" class="form-control">
+										<option
+											th:each="state : ${T(com.plenumsoft.vuzee.entities.TaskState).values()}"
+											th:value="${{state}}" th:text="${state}"></option>
+									</select>
 								</div>
 							</div>
 							<!-- /.box-body -->
@@ -82,6 +80,14 @@
 			</form>
 		</section>
 
+
+		<script type="text/javascript">
+			$(function() {
+				$('.datepicker').datepicker({
+					format : "dd/mm/yy"
+				});
+			});
+		</script>
 	</div>
 </body>
 </html>

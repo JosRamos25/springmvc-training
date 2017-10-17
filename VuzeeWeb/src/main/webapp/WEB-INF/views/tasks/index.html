@@ -3,7 +3,7 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorator="layout/main">
 <head>
-<title>Candidates</title>
+<title>Tareas</title>
 </head>
 <body>
 
@@ -17,10 +17,10 @@
 		</th:block>
 
 		<section class="content-header">
-			<h1>Candidatos</h1>
+			<h1>Tareas</h1>
 			<ol class="breadcrumb">
 				<li><a th:href="@{/}"><i class="fa fa-dashboard"></i> Home</a></li>
-				<li class="active">Candidatos</li>
+				<li class="active">Tareas</li>
 			</ol>
 		</section>
 
@@ -28,8 +28,8 @@
 			<div class="box-header">
 				<h3 class="box-title">Listado</h3>
 				<a class="btn btn-default pull-right"
-					th:href="@{/candidates/create}"> <i class="ion-ios-plus"></i>
-					Nuevo
+					th:href="@{/tasks/create}"> <i class="ion-ios-plus"></i>
+					Nueva
 				</a>
 			</div>
 			<!-- /.box-header -->
@@ -39,41 +39,28 @@
 						<tr>
 							<th>Id</th>
 							<th>Nombre</th>
-							<th>Aplica para</th>
-							<th>Fecha Alta</th>
-							<th>CV</th>
+							<th>Estado</th>
+							<th>Fecha</th>
+							<th>Con Calificaci&oacute;n</th>
 							<th>Editar</th>
 							<th>Eliminar</th>
 						</tr>
 					</thead>
 					<tbody>
 
-						<tr th:each="candidate : ${candidates}"
-							th:id="'candidate' + ${candidate.id}">
-							<td th:text="${candidate.id}"></td>
-							<td th:text="${candidate.name}"></td>
-							<td th:text="${candidate.positionApplied}"></td>
+						<tr th:each="task : ${tasks}"
+							th:id="'task' + ${task.id}">
+							<td th:text="${task.id}"></td>
+							<td th:text="${task.candidate.name}"></td>
+							<td th:text="${task.taskState}"></td>
 							<td
-								th:text="${#dates.format(candidate.createdAt, 'dd-MMM-yyyy HH:ss')}">Agregado
+								th:text="${#dates.format(task.taskDate, 'dd-MMM-yyyy')}">L&iacute;mite
 								el</td>
-							<td><th:block th:if="${candidate.cv}">
-									<a th:href="@{/candidates/downloadcv/__${candidate.id}__}"
-										target="_blank">Descargar <span
-										class="glyphicon glyphicon-cloud-download"></span></a>
-								</th:block> <th:block th:unless="${candidate.cv}">
-									<form method="POST" enctype="multipart/form-data"
-										action="candidates/uploadcv" th:id="'form' + ${candidate.id}">
-										<input type="hidden" name="id" th:value="${candidate.id}" />
-										<input type="file" name="file" /> <a href="#"
-											th:onclick="'submitForm(' + ${candidate.id} + ');'">
-											Subir <span class="glyphicon glyphicon-cloud-upload"></span>
-										</a>
-									</form>
-								</th:block></td>
-							<td><a th:href="@{/candidates/edit/__${candidate.id}__}"><span
+							<td th:text="(${task.hasRating}?'SI':'NO')"></td>
+							<td><a th:href="@{/tasks/edit/__${task.id}__}"><span
 									class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>
 							<td><a href="#"
-								th:onclick="'deleteCandidate(' + ${candidate.id} + ');'"><span
+								th:onclick="'deleteTask(' + ${task.id} + ');'"><span
 									class="glyphicon glyphicon-trash" aria-hidden="true"></span></a></td>
 						</tr>
 					</tbody>
@@ -99,7 +86,7 @@
 		<script th:src="@{/resources/sweetalert2/dist/sweetalert2.all.min.js}"></script>
 
 		<script type="text/javascript">
-			function deleteCandidate(id) {
+			function deleteTask(id) {
 				swal({
 					title : 'Esta seguro?',
 					text : "Esta acción no se podra deshacer!",
@@ -114,17 +101,17 @@
 									$
 											.ajax({
 												type : "DELETE",
-												url : "candidates/delete/" + id,
+												url : "tasks/delete/" + id,
 												success : function(response) {
 													$('#data-table')
 															.DataTable()
 															.row(
-																	$("#candidate"
+																	$("#task"
 																			+ id))
 															.remove().draw();
 													swal(
 															'Eliminad!',
-															'Se a eliminado al candidato.',
+															'Se ha eliminado la tarea.',
 															'success')
 												},
 												error : function(xhr,

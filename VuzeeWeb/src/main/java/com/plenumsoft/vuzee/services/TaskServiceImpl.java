@@ -2,9 +2,12 @@ package com.plenumsoft.vuzee.services;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.plenumsoft.vuzee.entities.Task;
 import com.plenumsoft.vuzee.repositories.TaskRepository;
 
+@Service
 public class TaskServiceImpl implements TaskService {
 
 	private TaskRepository taskRepository;

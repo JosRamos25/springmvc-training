@@ -10,8 +10,12 @@ import com.plenumsoft.vuzee.entities.Task;
 public interface TaskService {
 
 	List<Task> getAll();
+
 	Task findById(Long id);
+
 	Long addTask(Task task);
+
 	void updateTask(Task task);
+
 	void deleteTask(Long id);
 }
