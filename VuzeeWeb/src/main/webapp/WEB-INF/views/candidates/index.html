@@ -6,7 +6,16 @@
 <title>Candidates</title>
 </head>
 <body>
+
+
 	<div layout:fragment="content">
+		<th:block th:if="${message}">
+			<div class="alert alert-success alert-dismissable fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="cerrar">&times;</a>
+				<strong th:text="${message}"></strong>
+			</div>
+		</th:block>
+
 		<section class="content-header">
 			<h1>Candidatos</h1>
 			<ol class="breadcrumb">
@@ -32,6 +41,7 @@
 							<th>Nombre</th>
 							<th>Aplica para</th>
 							<th>Fecha Alta</th>
+							<th>CV</th>
 							<th>Editar</th>
 							<th>Eliminar</th>
 						</tr>
@@ -46,29 +56,27 @@
 							<td
 								th:text="${#dates.format(candidate.createdAt, 'dd-MMM-yyyy HH:ss')}">Agregado
 								el</td>
-							<!-- <td>
-                                    <a href="#" target="_blank">Descargar
-                                        <i class="ion-archive"></i></a>
-                                    </td>-->
+							<td><th:block th:if="${candidate.cv}">
+									<a th:href="@{/candidates/downloadcv/__${candidate.id}__}"
+										target="_blank">Descargar <span
+										class="glyphicon glyphicon-cloud-download"></span></a>
+								</th:block> <th:block th:unless="${candidate.cv}">
+									<form method="POST" enctype="multipart/form-data"
+										action="candidates/uploadcv" th:id="'form' + ${candidate.id}">
+										<input type="hidden" name="id" th:value="${candidate.id}" />
+										<input type="file" name="file" /> <a href="#"
+											th:onclick="'submitForm(' + ${candidate.id} + ');'">
+											Subir <span class="glyphicon glyphicon-cloud-upload"></span>
+										</a>
+									</form>
+								</th:block></td>
 							<td><a th:href="@{/candidates/edit/__${candidate.id}__}"><span
 									class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>
 							<td><a href="#"
 								th:onclick="'deleteCandidate(' + ${candidate.id} + ');'"><span
 									class="glyphicon glyphicon-trash" aria-hidden="true"></span></a></td>
 						</tr>
-
-
 					</tbody>
-					<tfoot>
-						<tr>
-							<th>Id</th>
-							<th>Nombre</th>
-							<th>Aplica para</th>
-							<th>Fecha Alta</th>
-							<th>Editar</th>
-							<th>Eliminar</th>
-						</tr>
-					</tfoot>
 				</table>
 			</div>
 			<!-- /.box-body -->
@@ -87,22 +95,53 @@
 			th:src="@{/resources/jquery-slimscroll/jquery.slimscroll.min.js}"></script>
 		<!-- FastClick -->
 		<script th:src="@{/resources/fastclick/lib/fastclick.js}"></script>
+		<!-- SweetAlert2 -->
+		<script th:src="@{/resources/sweetalert2/dist/sweetalert2.all.min.js}"></script>
 
 		<script type="text/javascript">
 			function deleteCandidate(id) {
-				$.ajax({
-					type : "DELETE",
-					url : "candidates/delete/" + id,
-					success : function(response) {
-						//$("#candidate" + id).remove();
-						$('#data-table').DataTable().row($("#candidate" + id))
-								.remove().draw();
-					},
-					error : function(xhr, ajaxOptions, thrownError) {
-						console.log(xhr.responseText);
-					}
-				});
+				swal({
+					title : 'Esta seguro?',
+					text : "Esta acción no se podra deshacer!",
+					type : 'warning',
+					showCancelButton : true,
+					confirmButtonColor : '#3085d6',
+					cancelButtonColor : '#d33',
+					confirmButtonText : 'Si, Eliminalo!'
+				})
+						.then(
+								function() {
+									$
+											.ajax({
+												type : "DELETE",
+												url : "candidates/delete/" + id,
+												success : function(response) {
+													$('#data-table')
+															.DataTable()
+															.row(
+																	$("#candidate"
+																			+ id))
+															.remove().draw();
+													swal(
+															'Eliminad!',
+															'Se a eliminado al candidato.',
+															'success')
+												},
+												error : function(xhr,
+														ajaxOptions,
+														thrownError) {
+													console
+															.log(xhr.responseText);
+												}
+											});
+
+								});
+
 			}
+			function submitForm(id) {
+				$("#form" + id).submit();
+			}
+
 			$(function() {
 				$('#data-table')
 						.DataTable(
@@ -120,8 +159,7 @@
 										}
 									}
 								});
-
-			})
+			});
 		</script>
 	</th:block>
 </body>

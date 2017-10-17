@@ -17,6 +17,7 @@ public class Candidate {
 	private String positionApplied;
 	private Date createdAt;
 	private String createdBy;
+    private byte[] cv;
 	
 	public Long getId() {
 		return id;
@@ -47,5 +48,11 @@ public class Candidate {
 	}
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
+	}
+	public byte[] getCv() {
+		return cv;
+	}
+	public void setCv(byte[] cv) {
+		this.cv = cv;
 	}
 }
