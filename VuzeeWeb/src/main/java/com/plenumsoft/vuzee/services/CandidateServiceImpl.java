@@ -3,19 +3,20 @@ package com.plenumsoft.vuzee.services;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.plenumsoft.vuzee.entities.Candidate;
 import com.plenumsoft.vuzee.repositories.CandidateRepository;
+import com.plenumsoft.vuzee.repositories.TaskRepository;
 
 @Service
 public class CandidateServiceImpl implements CandidateService {
-	CandidateRepository candidateRepository;
+	private CandidateRepository candidateRepository;
+	private TaskRepository taskRepository;
 
-	public CandidateServiceImpl(CandidateRepository candidateRepository) {
+	public CandidateServiceImpl(CandidateRepository candidateRepository, TaskRepository taskRepository) {
 		super();
 		this.candidateRepository = candidateRepository;
-
+		this.taskRepository = taskRepository;
 	}
 
 	@Override
@@ -56,6 +57,7 @@ public class CandidateServiceImpl implements CandidateService {
 
 	@Override
 	public void deleteCandidate(Long id) {
+		this.taskRepository.delete(this.taskRepository.findByCandidate(this.findById(id)));
 		candidateRepository.delete(id);
 	}
 

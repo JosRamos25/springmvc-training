@@ -57,8 +57,7 @@ public class CandidatesController {
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public String PostCreateCandidate(@Valid CandidateCreateViewModel candidateCreateViewModel, Model model,
-			RedirectAttributes redirectAttributes, BindingResult bindingResult, @RequestParam("cv") MultipartFile cv)
-			throws IOException {
+			RedirectAttributes redirectAttributes, BindingResult bindingResult) throws IOException {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("message", "Favor de verificar las entradas");
 			return prefix + "create";
@@ -68,8 +67,8 @@ public class CandidatesController {
 		candidate.setPositionApplied(candidateCreateViewModel.getPositionApplied());
 		candidate.setCreatedBy("msoberanis");// TODO: hard-code
 		candidate.setCreatedAt(new Date());
-		if (cv != null) {
-			candidate.setCv(cv.getBytes());
+		if (candidateCreateViewModel.getCv() != null) {
+			candidate.setCv(candidateCreateViewModel.getCv().getBytes());
 		}
 		candidateService.addCandidate(candidate);
 		redirectAttributes.addFlashAttribute("message", "Se ha creado correctamente el candidato");
