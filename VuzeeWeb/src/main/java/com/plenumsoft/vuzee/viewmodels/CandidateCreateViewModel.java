@@ -5,9 +5,12 @@ import javax.validation.constraints.Size;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import io.swagger.annotations.ApiModelProperty;
+
 public class CandidateCreateViewModel {
 	@NotNull
 	@Size(min = 2, max = 200)
+	@ApiModelProperty(notes = "Candidate's name", required = true)
 	private String name;
 	@NotNull
 	@Size(min = 2, max = 20)

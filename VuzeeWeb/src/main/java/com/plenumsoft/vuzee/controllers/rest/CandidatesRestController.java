@@ -21,8 +21,14 @@ import com.plenumsoft.vuzee.services.CandidateService;
 import com.plenumsoft.vuzee.viewmodels.CandidateCreateViewModel;
 import com.plenumsoft.vuzee.viewmodels.CandidateEditViewModel;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @RequestMapping("/api/v1/candidates")
+@Api(value = "Api para la gestión de Candidatos")
 public class CandidatesRestController {
 
 	private CandidateService candidateService;
@@ -33,6 +39,11 @@ public class CandidatesRestController {
 		this.candidateService = candidateService;
 	}
 
+	@ApiOperation(value = "Find a candidate by id", response = Candidate.class)
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Successfully retrieved list"),
+	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
+	})
 	@GetMapping(value = ("/{id}"))
 	ResponseEntity<Candidate> getCandidateById(@PathVariable Long id) {
 		Candidate candidate = this.candidateService.findById(id);
