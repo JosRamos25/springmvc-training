@@ -3,15 +3,29 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorator="layout/main">
 <head>
-	<title>Home</title>
+<title>Home</title>
 </head>
 <body>
 	<div layout:fragment="content">
-		<h1>Este es el dashboard</h1>
-		<pre>
-		Aquí se debe mostrar un resumen 
-		con el número de tareas que tiene un candidato
-		</pre>
+		<h1>Dashboard</h1>
+		<div class="container-fluid">
+			<div th:each="card : ${candidateCards}"
+				class="panel panel-primary col-md-3">
+				<div class="panel-heading">
+					<h3 class="panel-title" th:text="${card.name}"></h3>
+				</div>
+				<div class="panel-body">
+					<ul class="list-group">
+						<li class="list-group-item list-group-item-warning"><span
+							class="badge" th:text="${card.pending}"></span>Pendientes</li>
+						<li class="list-group-item list-group-item-info"><span
+							class="badge" th:text="${card.inProgress}"></span>En Proceso</li>
+						<li class="list-group-item list-group-item-success"><span
+							class="badge" th:text="${card.done}"></span>Terminadas</li>
+					</ul>
+				</div>
+			</div>
+		</div>
 	</div>
 </body>
 </html>
