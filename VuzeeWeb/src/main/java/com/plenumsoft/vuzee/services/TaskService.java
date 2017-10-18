@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.plenumsoft.vuzee.entities.Candidate;
 import com.plenumsoft.vuzee.entities.Task;
 
 @Service
@@ -18,4 +19,6 @@ public interface TaskService {
 	void updateTask(Task task);
 
 	void deleteTask(Long id);
+
+	List<Task> findByCandidate(Candidate candidate);
 }

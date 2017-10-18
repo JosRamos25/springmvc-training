@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.plenumsoft.vuzee.entities.Candidate;
 import com.plenumsoft.vuzee.entities.Task;
 import com.plenumsoft.vuzee.repositories.TaskRepository;
 
@@ -45,6 +46,12 @@ public class TaskServiceImpl implements TaskService {
 	public void deleteTask(Long id) {
 		// TODO Auto-generated method stub
 		this.taskRepository.delete(id);
+	}
+
+	@Override
+	public List<Task> findByCandidate(Candidate candidate) {
+		// TODO Auto-generated method stub
+		return this.taskRepository.findByCandidate(candidate);
 	}
 
 }
