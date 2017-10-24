@@ -36,7 +36,7 @@
 							<!-- form start -->
 							<div class="box-body">
 								<div class="form-group">
-									<label class="control-label">Nombre</label> <input type="text"
+									<label class="control-label" th:text="#{candidate.name}"></label> <input type="text"
 										th:field="*{name}" class="form-control" /> <span
 										th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
 										class="text-danger">Error en nombre</span>

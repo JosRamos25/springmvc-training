@@ -30,7 +30,25 @@ public class HomeController {
 		this.taskService = taskService;
 	}
 
+	@RequestMapping(value = "/login")
+	public ModelAndView login() {
+		ModelAndView mv = new ModelAndView("login");
+		return mv;
+	}
+	
+	@RequestMapping(value = "/login{logout}")
+	public ModelAndView logout() {
+		ModelAndView mv = new ModelAndView("login");
+		return mv;
+	}
+
 	@RequestMapping(value = "/")
+	public ModelAndView home() {
+		ModelAndView mv = new ModelAndView(prefix + "index");
+		return mv;
+	}
+
+	@RequestMapping(value = "/dashboard")
 	public ModelAndView index() {
 		ModelAndView mv = new ModelAndView("index");
 		List<CandidateCard> cards = new ArrayList<>();
