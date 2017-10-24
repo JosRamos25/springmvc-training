@@ -4,3 +4,4 @@
 /Vuzee.Flyway/lib/
 /VuzeeWeb/src/main/webapp/resources/*
 !/VuzeeWeb/src/main/webapp/resources/css
+/VuzeeWeb/src/main/webapp/node_modules/

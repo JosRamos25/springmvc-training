@@ -1,0 +1,26 @@
+{
+		"name": "VuzeeWeb",
+		"version": "1.0.0",
+		"description": "Spring training",
+		"main": "index.html",
+		"author": "Josue",
+		"license": "MIT",
+		"private": true,
+		"dependencies": {
+				"bootstrap": "^3.3.7",
+				"bootstrap-datepicker": "^1.7.1",
+				"bootstrap-daterangepicker": "^2.1.25",
+				"datatables": "^1.10.13",
+				"datatables.net": "^1.10.16",
+				"datatables.net-bs": "^2.1.1",
+				"fastclick": "^1.0.6",
+				"font-awesome": "^4.7.0",
+				"globalize": "^1.3.0",
+				"inputmask": "^3.3.9",
+				"ionicons": "^3.0.0",
+				"jquery": "^3.2.1",
+				"jquery-slimscroll": "^1.3.8",
+				"modernizr": "^3.5.0",
+				"sweetalert2": "^6.10.3"
+		}
+}
