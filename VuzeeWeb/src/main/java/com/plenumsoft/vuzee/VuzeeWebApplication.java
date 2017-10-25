@@ -13,11 +13,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import com.plenumsoft.vuzee.utils.ModelMapperUtil;
+
 @SpringBootApplication
 public class VuzeeWebApplication extends WebMvcConfigurerAdapter {
 
 	public static void main(String[] args) {
 		SpringApplication.run(VuzeeWebApplication.class, args);
+	}
+
+	@Bean
+	public ModelMapperUtil modelMapper() {
+		return new ModelMapperUtil();
 	}
 
 	@Bean

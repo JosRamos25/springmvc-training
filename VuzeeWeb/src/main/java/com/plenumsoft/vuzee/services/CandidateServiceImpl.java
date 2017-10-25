@@ -2,6 +2,8 @@ package com.plenumsoft.vuzee.services;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.plenumsoft.vuzee.entities.Candidate;
@@ -22,6 +24,11 @@ public class CandidateServiceImpl implements CandidateService {
 	@Override
 	public List<Candidate> getAll() {
 		return (List<Candidate>) this.candidateRepository.findAll();
+	}
+
+	@Override
+	public Page<Candidate> getAll(Pageable pageable) {
+		return this.candidateRepository.findAll(pageable);
 	}
 
 	@Override

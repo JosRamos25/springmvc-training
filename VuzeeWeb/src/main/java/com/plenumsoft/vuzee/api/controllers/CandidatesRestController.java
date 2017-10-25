@@ -1,9 +1,13 @@
-package com.plenumsoft.vuzee.controllers.rest;
+package com.plenumsoft.vuzee.api.controllers;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.List;
 
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +20,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.plenumsoft.vuzee.api.models.CandidateApiModel;
+import com.plenumsoft.vuzee.api.models.CandidateEditApiModel;
 import com.plenumsoft.vuzee.entities.Candidate;
 import com.plenumsoft.vuzee.services.CandidateService;
+import com.plenumsoft.vuzee.utils.ModelMapperUtil;
 import com.plenumsoft.vuzee.viewmodels.CandidateCreateViewModel;
-import com.plenumsoft.vuzee.viewmodels.CandidateEditViewModel;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,62 +38,75 @@ import io.swagger.annotations.ApiResponses;
 public class CandidatesRestController {
 
 	private CandidateService candidateService;
+	private ModelMapperUtil modelMapperUtil;
 
 	@Autowired
-	public CandidatesRestController(CandidateService candidateService) {
+	public CandidatesRestController(CandidateService candidateService, ModelMapperUtil modelMapperUtil) {
 		super();
 		this.candidateService = candidateService;
+		this.modelMapperUtil = modelMapperUtil;
 	}
 
 	@ApiOperation(value = "Find a candidate by id", response = Candidate.class)
-	@ApiResponses(value={
-			@ApiResponse(code = 200, message = "Successfully retrieved list"),
-	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
-	})
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully retrieved list"),
+			@ApiResponse(code = 404, message = "The resource you were trying to reach is not found") })
 	@GetMapping(value = ("/{id}"))
-	ResponseEntity<Candidate> getCandidateById(@PathVariable Long id) {
+	ResponseEntity<CandidateApiModel> getCandidateById(@PathVariable Long id) {
 		Candidate candidate = this.candidateService.findById(id);
 		if (candidate == null) {
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<Candidate>(candidate, HttpStatus.OK);
+		CandidateApiModel candidateApi = modelMapperUtil.mapObject(CandidateApiModel.class, candidate);
+		candidateApi.add(linkTo(methodOn(this.getClass()).getCandidateById(id)).withSelfRel());
+		return new ResponseEntity<CandidateApiModel>(candidateApi, HttpStatus.OK);
 	}
 
 	@GetMapping
-	ResponseEntity<List<Candidate>> getCandidates() {
+	ResponseEntity<List<CandidateApiModel>> getCandidates() {
 
 		List<Candidate> candidates = this.candidateService.getAll();
 		if (candidates.isEmpty()) {
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<List<Candidate>>(candidates, HttpStatus.OK);
+		Type listType = new TypeToken<List<CandidateApiModel>>() {
+		}.getType();
+		List<CandidateApiModel> candidatesApi = modelMapperUtil.mapObject(listType, candidates);
+
+		return new ResponseEntity<List<CandidateApiModel>>(candidatesApi, HttpStatus.OK);
 	}
+	//
+	// @GetMapping(value = ("/{page}"))
+	// ResponseEntity<List<Candidate>> getCandidates(@PathVariable Integer numPage)
+	// {
+	//
+	// Page<Candidate> page = this.candidateService.getAll(new PageRequest(numPage,
+	// 3));
+	// List<Candidate> candidates = page.getContent();
+	// if (candidates.isEmpty()) {
+	// return new ResponseEntity(HttpStatus.NOT_FOUND);
+	// }
+	// return new ResponseEntity<List<Candidate>>(candidates, HttpStatus.OK);
+	// }
 
 	@PostMapping
-	ResponseEntity<Long> saveCandidates(@RequestBody CandidateCreateViewModel candidateCreateViewModel)
-			throws IOException {
+	ResponseEntity<Long> saveCandidates(@RequestBody CandidateCreateViewModel candidateCreate) throws IOException {
 		Candidate candidate = new Candidate();
-		candidate.setName(candidateCreateViewModel.getName());
-		candidate.setPositionApplied(candidateCreateViewModel.getPositionApplied());
+		candidate.setName(candidateCreate.getName());
+		candidate.setPositionApplied(candidateCreate.getPositionApplied());
 		candidate.setCreatedBy("msoberanis");// TODO: hard-code
 		candidate.setCreatedAt(new Date());
-		if (candidateCreateViewModel.getCv() != null) {
-			candidate.setCv(candidateCreateViewModel.getCv().getBytes());
+		if (candidateCreate.getCv() != null) {
+			candidate.setCv(candidateCreate.getCv().getBytes());
 		}
 		return new ResponseEntity<Long>(this.candidateService.addCandidate(candidate), HttpStatus.CREATED);
 	}
 
 	@PutMapping(value = ("/{id}"))
-	ResponseEntity<?> updateCandidate(@PathVariable Long id,
-			@RequestBody CandidateEditViewModel candidateEditViewModel) {
+	ResponseEntity<?> updateCandidate(@PathVariable Long id, @RequestBody CandidateEditApiModel candidateEdit) {
 
 		Candidate candidate = candidateService.findById(id);
-		//
-		// if (cv != null) {
-		// candidate.setCv(cv.getBytes());
-		// }
-		candidate.setName(candidateEditViewModel.getName());
-		candidate.setPositionApplied(candidateEditViewModel.getPositionApplied());
+		candidate.setName(candidateEdit.getName());
+		candidate.setPositionApplied(candidateEdit.getPositionApplied());
 		this.candidateService.updateCandidate(candidate);
 		return new ResponseEntity<String>("Se actualizo el candidato" + id, HttpStatus.OK);
 	}
