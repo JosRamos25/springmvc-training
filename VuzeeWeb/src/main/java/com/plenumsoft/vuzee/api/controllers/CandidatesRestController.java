@@ -74,19 +74,7 @@ public class CandidatesRestController {
 
 		return new ResponseEntity<List<CandidateApiModel>>(candidatesApi, HttpStatus.OK);
 	}
-	//
-	// @GetMapping(value = ("/{page}"))
-	// ResponseEntity<List<Candidate>> getCandidates(@PathVariable Integer numPage)
-	// {
-	//
-	// Page<Candidate> page = this.candidateService.getAll(new PageRequest(numPage,
-	// 3));
-	// List<Candidate> candidates = page.getContent();
-	// if (candidates.isEmpty()) {
-	// return new ResponseEntity(HttpStatus.NOT_FOUND);
-	// }
-	// return new ResponseEntity<List<Candidate>>(candidates, HttpStatus.OK);
-	// }
+
 
 	@PostMapping
 	ResponseEntity<Long> saveCandidates(@RequestBody CandidateCreateViewModel candidateCreate) throws IOException {

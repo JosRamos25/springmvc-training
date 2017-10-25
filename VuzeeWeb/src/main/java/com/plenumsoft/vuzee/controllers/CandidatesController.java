@@ -1,30 +1,41 @@
 package com.plenumsoft.vuzee.controllers;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.plenumsoft.vuzee.api.models.CandidateApiModel;
 import com.plenumsoft.vuzee.entities.Candidate;
 import com.plenumsoft.vuzee.services.CandidateService;
+import com.plenumsoft.vuzee.utils.ModelMapperUtil;
 import com.plenumsoft.vuzee.viewmodels.CandidateCreateViewModel;
 import com.plenumsoft.vuzee.viewmodels.CandidateEditViewModel;
+import com.plenumsoft.vuzee.viewmodels.CandidatePageViewModel;
+import com.plenumsoft.vuzee.viewmodels.CandidateViewModel;
 
 @Controller
 @RequestMapping(value = { "/candidates" })
@@ -32,14 +43,16 @@ public class CandidatesController {
 	private final String prefix = "candidates/";
 
 	private CandidateService candidateService;
+	private ModelMapperUtil modelMapperUtil;
 
 	public CandidatesController() {
 	}
 
 	@Autowired
-	public CandidatesController(CandidateService candidateService) {
+	public CandidatesController(CandidateService candidateService, ModelMapperUtil modelMapperUtil) {
 		super();
 		this.candidateService = candidateService;
+		this.modelMapperUtil = modelMapperUtil;
 	}
 
 	@RequestMapping(value = { "/", "" })
@@ -53,6 +66,23 @@ public class CandidatesController {
 	@RequestMapping(value = { "/create" })
 	public String PrepareCreate(CandidateCreateViewModel candidateCreateViewModel) {
 		return prefix + "create";
+	}
+
+	@GetMapping(value = ("/page"))
+	@ResponseBody
+	ResponseEntity<CandidatePageViewModel> getCandidates(@RequestParam("numPage") int numPage,
+			@RequestParam("length") int length, @RequestParam("draw") int draw) {
+
+		Page<Candidate> page = this.candidateService.getAll(new PageRequest(numPage, length));
+		Type listType = new TypeToken<List<CandidateViewModel>>() {
+		}.getType();
+		List<CandidateViewModel> candidates = modelMapperUtil.mapObject(listType, page.getContent());
+		CandidatePageViewModel pageView = new CandidatePageViewModel(draw, page.getTotalElements(), page.getTotalElements(), candidates);
+		
+		if (candidates.isEmpty()) {
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<CandidatePageViewModel>(pageView, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
